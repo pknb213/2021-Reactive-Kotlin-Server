@@ -9,12 +9,25 @@ import reactor.netty.tcp.TcpServer
 object Server {
     init {
         val TEST_DB_NAME = "userhabit"
-        val db by lazy {
-            val client = MongoClients.create("mongodb://localhost:27017")
-            client.getDatabase(TEST_DB_NAME)
-        }
-        println(db.listCollections())
-        db.createCollection("Test_Collection")
+        val TEST_COLLECTION_NAME = "app"
+//        val db by lazy {
+//            val client = MongoClients.create("mongodb://localhost:27017")
+//            client.getDatabase(TEST_DB_NAME)
+//        }
+//        println(db.listCollections())
+//        db.createCollection("Test_Collection")
+        val client = MongoClients.create()
+        println(">> ${client}")
+        val db = client.getDatabase(TEST_DB_NAME)
+        println(">> ${db}")
+        val coll = db.getCollection(TEST_COLLECTION_NAME)
+        println(">> ${coll}")
+        val collog = Mono.just(coll).log()
+        println(collog)
+        collog.subscribe({
+            println(it.toString())
+        })
+
     }
     @JvmStatic
     fun main(args: Array<String>) {

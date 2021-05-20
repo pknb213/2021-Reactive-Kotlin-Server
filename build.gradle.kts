@@ -13,7 +13,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("io.projectreactor.netty" , "reactor-netty" , "1.0.+")
-    implementation("org.mongodb" , "mongodb-driver-reactivestreams" , "4.0.4")
+//    implementation("org.slf4j", "slf4j-api")
+    implementation("org.mongodb" , "mongodb-driver-reactivestreams" , "4.2.3")
     implementation("com.fasterxml.jackson.core" , "jackson-databind" , "2.10.4")
     implementation(kotlin("reflect"))
     implementation("com.auth0" , "java-jwt" , "3.10.3")
