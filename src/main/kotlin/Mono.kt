@@ -48,6 +48,20 @@ fun `delay test`() {
     countDownLatch.await()
 }
 
+fun `delay error test`() {
+    val countDownLatch = CountDownLatch(1)
+
+    Mono.zipDelayError(testMethod1(), Mono.error<NullPointerException>(NullPointerException()), testMethod1(), Mono.error<IllegalArgumentException>(IllegalArgumentException()))
+        .subscribe({ }, {
+            println(it)
+            countDownLatch.countDown()
+        }, {
+            countDownLatch.countDown()
+        })
+
+    countDownLatch.await()
+}
+
 object Mono {
     @JvmStatic
     fun main(args: Array<String>) {
@@ -75,11 +89,10 @@ object Mono {
         val defer = Mono.just("Defer")
             .switchIfEmpty(Mono.defer {Mono.just("As")})
             .subscribe { println(">>> Defer : $it")}
-        // For
+        // From
         Mono.from(Flux.just(1, 2, 3, 4, 5))
             .subscribe { println(">>> from : $it") }
-
-
-
+        // DelayError
+        `delay error test`()
     }
 }
