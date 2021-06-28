@@ -3,9 +3,15 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.netty.http.server.HttpServer
-
+import reactor.util.Loggers
+import org.slf4j.Logger
+import MongoUtil
+import org.bson.Document
+import java.time.Duration
+import kotlin.concurrent.timer
 
 object Server {
+    private val log = Loggers.getLogger(this.javaClass)
     init {
         val TEST_DB_NAME = "userhabit"
         val TEST_COLLECTION_NAME = "app"
@@ -55,6 +61,28 @@ object Server {
             }
             .port(4500)
             .bindNow()
+        """ Test Aggregation """
+        var qry = listOf(
+            Document("\$match", "")
+        )
+
+        Flux
+            .from(MongoUtil.getCollection("app")
+                .aggregate(qry)
+            )
+            .map {
+                println(">>> $it")
+            }
+            .subscribe()
+
+        // Test
+        val timer = Flux.interval(Duration.ofMillis(100)).map{}
+        val sec = Flux.interval(Duration.ofSeconds(1)).map { tick -> "$tick Second(1)" }
+        val mil = Flux.interval(Duration.ofMillis(700)).map { tick -> "$tick Millis(700)" }
+
+        sec.take(5).map{println(it)}.subscribe()
+        mil.takeLast(3).map{println(it) }.subscribe()
+
         server.onDispose().block()
     }
 }
