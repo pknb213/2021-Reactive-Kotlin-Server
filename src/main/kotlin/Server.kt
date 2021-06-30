@@ -7,7 +7,10 @@ import reactor.util.Loggers
 import org.slf4j.Logger
 import MongoUtil
 import org.bson.Document
+import org.slf4j.LoggerFactory
+import reactor.util.function.Tuples
 import java.time.Duration
+import java.util.*
 import kotlin.concurrent.timer
 
 object Server {
@@ -76,12 +79,12 @@ object Server {
             .subscribe()
 
         // Test
-        val timer = Flux.interval(Duration.ofMillis(100)).map{}
-        val sec = Flux.interval(Duration.ofSeconds(1)).map { tick -> "$tick Second(1)" }
-        val mil = Flux.interval(Duration.ofMillis(700)).map { tick -> "$tick Millis(700)" }
-
-        sec.take(5).map{println(it)}.subscribe()
-        mil.takeLast(3).map{println(it) }.subscribe()
+        Flux.range(1, 20)
+            .window(6)
+            .subscribe {
+                it.collectList()
+                    .subscribe{ res -> println(res) }
+            }
 
         server.onDispose().block()
     }
