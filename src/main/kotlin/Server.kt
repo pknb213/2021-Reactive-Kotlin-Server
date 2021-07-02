@@ -3,18 +3,18 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.netty.http.server.HttpServer
-import reactor.util.Loggers
-import org.slf4j.Logger
 import MongoUtil
 import org.bson.Document
-import org.slf4j.LoggerFactory
+import reactor.util.Loggers
+import reactor.util.Loggers.getLogger
 import reactor.util.function.Tuples
+import java.lang.Math.random
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.timer
 
 object Server {
-    private val log = Loggers.getLogger(this.javaClass)
+
     init {
         val TEST_DB_NAME = "userhabit"
         val TEST_COLLECTION_NAME = "app"
@@ -52,6 +52,7 @@ object Server {
     @JvmStatic
     fun main(args: Array<String>) {
         println("<< Welcome >>")
+        val log = Loggers.getLogger(this.javaClass)
         val server = HttpServer.create()
             .route{
                 it
@@ -69,22 +70,26 @@ object Server {
             Document("\$match", "")
         )
 
-        Flux
-            .from(MongoUtil.getCollection("app")
-                .aggregate(qry)
-            )
-            .map {
-                println(">>> $it")
-            }
-            .subscribe()
+//        Flux
+//            .from(MongoUtil.getCollection("app")
+//                .aggregate(qry)
+//            )
+//            .map {
+//                println(">>> $it")
+//            }
+//            .subscribe()
 
         // Test
         Flux.range(1, 20)
-            .window(6)
-            .subscribe {
-                it.collectList()
-                    .subscribe{ res -> println(res) }
+//            .log()
+            .parallel(2)
+            .runOn(Schedulers.newParallel("Par", 4))
+            .map {
+                val sleepT:Long = if(it % 2 != 0) ((random() * 1000).toLong()) else (((random()+1) * 1000).toLong())
+                Thread.sleep(sleepT)
+                log.info("$it   Sleep : $sleepT")
             }
+            .subscribe ()
 
         server.onDispose().block()
     }
