@@ -12,6 +12,7 @@ import java.lang.Math.random
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.timer
+import org.jetbrains.kotlinx.spark.api.*
 
 object Server {
 
@@ -79,17 +80,50 @@ object Server {
 //            }
 //            .subscribe()
 
+        // Spark Test
+//        val logFile = "/Users/cheon-youngjo/Downloads/spark-3.1.2-bin-hadoop3.2/README.md"
+//        withSpark {
+//            spark.read().textFile(logFile).withCached {
+//                val numAs = filter {it.contains("a")}.count()
+//                val numBs = filter {it.contains("b")}.count()
+//                println("Lines with a: $numAs, lines with b: $numBs")
+//            }
+//        }
+        val spark = SparkSession
+            .builder()
+            .master("local[2]")
+            .appName("Simple App").orCreate
+
+        spark.toDS(listOf("a" to 1, "b" to 2)).showDS()
+
+        withSpark {
+            dsOf(1, 2, 3, 4)
+                .map { it to it }
+                .showDS()
+        }
+
+        withSpark {
+            dsOf(1, 2, 3, 4, 5)
+                .map { it to (it * it)}
+                .withCached {
+                    showDS()
+                    filter { it.first % 2 == 0}.showDS()
+                }
+                .map { c(it.first, it.second, (it.first + it.second) * 2) }
+                .show()
+        }
+
         // Test
-        Flux.range(1, 20)
-//            .log()
-            .parallel(2)
-            .runOn(Schedulers.newParallel("Par", 4))
-            .map {
-                val sleepT:Long = if(it % 2 != 0) ((random() * 1000).toLong()) else (((random()+1) * 1000).toLong())
-                Thread.sleep(sleepT)
-                log.info("$it   Sleep : $sleepT")
-            }
-            .subscribe ()
+//        Flux.range(1, 20)
+////            .log()
+//            .parallel(2)
+//            .runOn(Schedulers.newParallel("Par", 4))
+//            .map {
+//                val sleepT:Long = if(it % 2 != 0) ((random() * 1000).toLong()) else (((random()+1) * 1000).toLong())
+//                Thread.sleep(sleepT)
+//                log.info("$it   Sleep : $sleepT")
+//            }
+//            .subscribe ()
 
         server.onDispose().block()
     }

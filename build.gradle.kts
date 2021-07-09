@@ -12,6 +12,9 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+//    implementation("org.jetbrains.kotlinx.spark", "kotlin-spark-api-common", "1.0.1")
+    implementation("org.jetbrains.kotlinx.spark", "kotlin-spark-api-3.0", "1.0.1")
+    implementation("org.apache.spark", "spark-sql_2.12", "3.+")
     implementation("io.projectreactor.netty" , "reactor-netty" , "1.0.+")
     implementation("ch.qos.logback" , "logback-classic" , "1.+")
 //    implementation("org.slf4j" , "slf4j-log4j12" , "1.7.30")
