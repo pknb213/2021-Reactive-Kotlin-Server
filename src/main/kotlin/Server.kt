@@ -13,6 +13,7 @@ import java.util.*
 import kotlin.concurrent.timer
 import org.jetbrains.kotlinx.spark.api.*
 import org.jetbrains.kotlinx.spark.api.SparkLogLevel.*
+import org.apache.spark.sql.Dataset
 
 
 object Server {
@@ -65,24 +66,50 @@ object Server {
             .bindNow()
 
         // Spark Test
-//        val logFile = "/Users/cheon-youngjo/Downloads/spark-3.1.2-bin-hadoop3.2/README.md"
+        val logFile = "src/test.txt"
+        println(">>> $logFile")
+        withSpark {
+            println(">>> With Spark")
+            spark.read().textFile(logFile).withCached {
+                var numAs = filter {
+                    it.contains("a")
+                }.count()
+                var numBs = filter { it.contains("b") }.count()
+            }
+        }
 //        withSpark {
-//            spark.read().textFile(logFile).withCached {
-//                val numAs = filter {it.contains("a")}.count()
-//                val numBs = filter {it.contains("b")}.count()
-//                println("Lines with a: $numAs, lines with b: $numBs")
-//            }
+//            spark
+//                .read()
+//                .textFile(this::class.java.classLoader.getResource("test.txt")?.path)
+//                .map { it.split(Regex("\\s")) }
+//                .flatten()
+//                .cleanup()
+//                .groupByKey { it }
+//                .mapGroups { k, iter -> k to iter.asSequence().count() }
+//                .sort { arrayOf(it.col("second").desc()) }
+//                .limit(20)
+//                .map { it.second to it.first }
+//                .show(false)
 //        }
 
-        val spark = SparkSession
-            .builder()
-            .master("local[2]")
-            .appName("Simple App").orCreate
-        spark.sparkContext.setLogLevel(ERROR)
 
-        spark.toDS(listOf("a" to 1, "b" to 2)).showDS()
+//        val spark = SparkSession
+//            .builder()
+//            .master("local[2]")
+//            .appName("Simple App").orCreate
+//        spark.sparkContext.setLogLevel(ERROR)
+//
+//        spark.toDS(listOf("a" to 1, "b" to 2)).showDS()
 
-
+//        }
         server.onDispose().block()
     }
 }
+const val MEANINGFUL_WORD_LENGTH = 4
+fun Dataset<String>.cleanup() =
+    filter { it.isNotBlank() }
+        .map { it.trim(',', ' ', '\n', ':', '.', ';', '?', '!', '"', '\'', '\t', '　') }
+        .filter { !it.endsWith("n’t") }
+        .filter { it.length >= MEANINGFUL_WORD_LENGTH }
+
+
