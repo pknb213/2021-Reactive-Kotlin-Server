@@ -66,31 +66,31 @@ object Server {
             .bindNow()
 
         // Spark Test
-        val logFile = "src/test.txt"
+        val logFile = "src/main/kotlin/test.txt"
         println(">>> $logFile")
-        withSpark {
-            println(">>> With Spark")
-            spark.read().textFile(logFile).withCached {
-                var numAs = filter {
-                    it.contains("a")
-                }.count()
-                var numBs = filter { it.contains("b") }.count()
-            }
-        }
+        println(">>> With Spark")
 //        withSpark {
-//            spark
-//                .read()
-//                .textFile(this::class.java.classLoader.getResource("test.txt")?.path)
-//                .map { it.split(Regex("\\s")) }
-//                .flatten()
-//                .cleanup()
-//                .groupByKey { it }
-//                .mapGroups { k, iter -> k to iter.asSequence().count() }
-//                .sort { arrayOf(it.col("second").desc()) }
-//                .limit(20)
-//                .map { it.second to it.first }
-//                .show(false)
+//            spark.read().textFile(logFile).withCached {
+//                var numAs = filter {
+//                    it.contains("a")
+//                }.count()
+//                var numBs = filter { it.contains("b") }.count()
+//            }
 //        }
+        withSpark {
+            spark
+                .read()
+                .textFile(this::class.java.classLoader.getResource("test.txt")?.path)
+                .map { it.split(Regex("\\s")) }
+                .flatten()
+                .cleanup()
+                .groupByKey { it }
+                .mapGroups { k, iter -> k to iter.asSequence().count() }
+                .sort { arrayOf(it.col("second").desc()) }
+                .limit(20)
+                .map { it.second to it.first }
+                .show(false)
+        }
 
 
 //        val spark = SparkSession

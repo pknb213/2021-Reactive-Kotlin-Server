@@ -14,19 +14,20 @@ dependencies {
     implementation(kotlin("stdlib"))
 //    implementation("org.jetbrains.kotlinx.spark", "kotlin-spark-api-common", "1.0.1")
     implementation("org.jetbrains.kotlinx.spark", "kotlin-spark-api-3.0", "1.0.1")
-    implementation("org.apache.spark", "spark-sql_2.12", "3.+")
+//    compileOnly("org.apache.spark:spark-sql_2.12:3.1.3")
+    implementation("org.apache.spark", "spark-sql_2.12", "3.1.3")
     implementation("io.projectreactor.netty" , "reactor-netty" , "1.0.+")
-    implementation("ch.qos.logback" , "logback-classic" , "1.+")
+//    implementation("ch.qos.logback" , "logback-classic" , "1.+")
 //    implementation("org.slf4j" , "slf4j-log4j12" , "1.7.30")
     implementation("org.mongodb" , "mongodb-driver-reactivestreams" , "4.2.3")
-    implementation("com.fasterxml.jackson.core" , "jackson-databind" , "2.10.4")
-    implementation(kotlin("reflect"))
-    implementation("com.auth0" , "java-jwt" , "3.10.3")
+//    implementation("com.fasterxml.jackson.core" , "jackson-databind" , "2.10.4")
+//    implementation(kotlin("reflect"))
+//    implementation("com.auth0" , "java-jwt" , "3.10.3")
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 }
 
